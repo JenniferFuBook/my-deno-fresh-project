@@ -4,8 +4,7 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 
 export const handler: Handlers<string | null> = {
   async GET(_, ctx) {
-    console.log(ctx);
-    const resp = await fetch(`http://${ctx.localAddr.hostname}:${ctx.localAddr.port}/api/joke`);
+    const resp = await fetch(`http://${ctx.remoteAddr.hostname}:${ctx.remoteAddr.port}/api/joke`);
     console.log(resp);
     if (resp.status === 404) {
       return ctx.render(null);
