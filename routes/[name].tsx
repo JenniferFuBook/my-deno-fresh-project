@@ -3,8 +3,9 @@ import { Fragment, h } from "preact";
 import { Handlers, PageProps } from "$fresh/server.ts";
 
 export const handler: Handlers<string | null> = {
-  async GET(_, _ctx) {
-    const resp = await fetch('http://localhost:8000/api/joke');
+  async GET(_req, _ctx) {
+    const urlArray = _req.url.split('/');
+    const resp = await fetch(`${urlArray[0]}//${urlArray[2]}/api/joke`);
     console.log(resp);
     if (resp.status === 404) {
       return _ctx.render(null);
