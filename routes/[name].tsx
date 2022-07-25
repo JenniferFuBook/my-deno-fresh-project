@@ -1,18 +1,25 @@
 /** @jsx h */
 import { Fragment, h } from "preact";
-import { Handlers, PageProps } from "$fresh/server.ts";
+import { HandlerContext, Handlers, PageProps } from "$fresh/server.ts";
+import { handler as jokeHandler } from './api/joke.ts';
+
+const GetFromHandler = async (
+  req: Request,
+  ctx: HandlerContext,
+  handler: (_req: Request, _ctx: HandlerContext) => Response
+) => {
+  const response = handler(req, ctx);
+  const decoded = new TextDecoder().decode(
+    (await response.body?.getReader().read())?.value
+  );
+
+  return decoded;
+};
 
 export const handler: Handlers<string | null> = {
-  async GET(_req, _ctx) {
-    const apiUrl = 'http://' + _req.headers.get('host')?.toString() + '/api/joke';
-    console.log(apiUrl);
-    const resp = await fetch(apiUrl);
-    console.log(resp);
-    if (resp.status === 404) {
-      return _ctx.render(null);
-    }
-    const result = await resp.text();
-    return _ctx.render(result);
+  async GET(_req: Request, _ctx: HandlerContext) {
+    const joke = await GetFromHandler(_req, _ctx, jokeHandler);
+      return _ctx.render(joke);
   },
 };
 
